@@ -55,3 +55,26 @@ class VestingWithdrawal:
         except Exception as e: 
             print(e)
             return False
+
+    def import_vtoken(self, amount, token):
+        print('importing...')
+        try:
+            tx = self.address.invokeScript(VIRES_IMPORT_CONTRACT,
+                                           VIRES_IMPORT_COMMAND,
+                                           [],
+                                           [
+                                            {"amount": amount,"assetId": token}
+                                            ],
+                                           txFee=WAVES_TRANSACTION_FEE
+                                           )
+            print(tx)
+            return True
+        except Exception as e:
+            print(e)
+            return False
+
+    def import_USDTLP(self, amount):
+        return self.import_vtoken(amount, VIRES_USDTLP_ADDRESS)
+
+    def import_USDCLP(self, amount):
+        return self.import_vtoken(amount, VIRES_USDTLP_ADDRESS)

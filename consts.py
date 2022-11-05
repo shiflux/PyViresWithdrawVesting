@@ -9,6 +9,7 @@ VIRES_VESTING_WITHDRAWAL_ARGS = [
     {"type": "boolean",  "value": True},
     ]
 VIRES_VESTING_API='https://api.vires.finance/user/{}/vesting/markets'
+LOOP_TIME = 60
 
 try:
     from local_consts import *

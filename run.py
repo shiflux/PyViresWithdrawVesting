@@ -2,6 +2,7 @@
 from vesting_withdrawal import VestingWithdrawal
 import time
 import argparse
+import consts
 
 def main():
     parser = argparse.ArgumentParser()
@@ -11,7 +12,7 @@ def main():
     
     while True:
         vw.check_vesting()
-        time.sleep(60)
+        time.sleep(consts.LOOP_TIME)
         
 if __name__ == '__main__':
     main()

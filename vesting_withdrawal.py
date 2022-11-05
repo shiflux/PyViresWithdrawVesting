@@ -23,7 +23,8 @@ class VestingWithdrawal:
             tx = self.address.invokeScript(VIRES_CONTRACT,
                                            VIRES_VESTING_WITHDRAWAL_COMMAND,
                                            VIRES_VESTING_WITHDRAWAL_ARGS,
-                                           []
+                                           [],
+                                           txFee=WAVES_TRANSACTION_FEE
                                            )
             print(tx)
             return True

@@ -57,18 +57,23 @@ class VestingWithdrawal:
             return False
 
     def import_vtoken(self, amount, token):
-        print('importing...')
         try:
-            tx = self.address.invokeScript(VIRES_IMPORT_CONTRACT,
-                                           VIRES_IMPORT_COMMAND,
-                                           [],
-                                           [
-                                            {"amount": amount,"assetId": token}
-                                            ],
-                                           txFee=WAVES_TRANSACTION_FEE
-                                           )
-            print(tx)
-            return True
+            height = self.get_block_height()
+
+            if height % WAVES_DAY_BLOCKS in [WAVES_DAY_BLOCKS-1, 0, 1]:
+                print('importing...')
+                tx = self.address.invokeScript(VIRES_IMPORT_CONTRACT,
+                                            VIRES_IMPORT_COMMAND,
+                                            [],
+                                            [
+                                                {"amount": amount,"assetId": token}
+                                                ],
+                                            txFee=WAVES_TRANSACTION_FEE
+                                            )
+                print(tx)
+                return True
+            print('{} blocks left to import'.format(WAVES_DAY_BLOCKS - (height%WAVES_DAY_BLOCKS)))
+            return False
         except Exception as e:
             print(e)
             return False
@@ -78,3 +83,9 @@ class VestingWithdrawal:
 
     def import_USDCLP(self, amount):
         return self.import_vtoken(amount, VIRES_USDTLP_ADDRESS)
+
+    def get_block_height(self):
+        result = simplejson.loads(requests.get(''.join([WAVES_NODE, WAVES_HEIGHT_API])).text)
+        if not result:
+                return None
+        return int(result['height'])

@@ -5,6 +5,7 @@ from consts import *
 
 class VestingWithdrawal:
     def __init__(self,  seed):
+        self.tries = WITHDRAW_MAX_TRIES_DAY
         try:
             pw.setNode(node = WAVES_NODE, chain = WAVES_CHAN)
         except Exception as e:
@@ -26,32 +27,48 @@ class VestingWithdrawal:
                                            [],
                                            txFee=WAVES_TRANSACTION_FEE
                                            )
+            
             print(tx)
-            return True
+            if 'error' in tx:
+                print('tx error')
+                return False
+            else:
+                self.tries -= 1
+                print('tries remaining: {}'.format(self.tries))
+                return True
         except Exception as e:
             print(e)
             return False
 
     def check_vesting(self):
         try:
-            result = simplejson.loads(requests.get(VIRES_VESTING_API.format(self.address.address)).text)
-            if not result:
-                return False
-            
-            # result is in microusd
-            available_today = int(result['availableToday'])/1000000
-            available_today_global = int(result['globallyAvailableToday'])/1000000
-            
-            if available_today>0:
-                if available_today_global>0:
-                    return self.withdraw()
+            height = self.get_block_height()
+
+            if height % WAVES_DAY_BLOCKS in [0, 1, 2]:
+                if self.tries == 0:
+                    return False
+
+                result = simplejson.loads(requests.get(VIRES_VESTING_API.format(self.address.address)).text)
+                if not result:
+                    return False
+                
+                # result is in microusd
+                available_today = int(result['availableToday'])/1000000
+                available_today_global = int(result['globallyAvailableToday'])/1000000
+                
+                if available_today>0:
+                    if available_today_global>0:
+                        return self.withdraw()
+                    else:
+                        print("No money available for withdrawal :(")
+                        return False
                 else:
-                    print("No money available for withdrawal :(")
+                    print("Already withdrawed today :)")
                     return False
             else:
-                print("Already withdrawed today :)")
+                self.tries = WITHDRAW_MAX_TRIES_DAY
+                print('{} blocks left to withdraw'.format(WAVES_DAY_BLOCKS - (height%WAVES_DAY_BLOCKS)))
                 return False
-
         except Exception as e: 
             print(e)
             return False
@@ -60,7 +77,7 @@ class VestingWithdrawal:
         try:
             height = self.get_block_height()
 
-            if height % WAVES_DAY_BLOCKS in [WAVES_DAY_BLOCKS-1, 0, 1]:
+            if height % WAVES_DAY_BLOCKS in [WAVES_DAY_BLOCKS-1, 0]:
                 print('importing...')
                 tx = self.address.invokeScript(VIRES_IMPORT_CONTRACT,
                                             VIRES_IMPORT_COMMAND,
@@ -68,7 +85,7 @@ class VestingWithdrawal:
                                             [
                                                 {"amount": amount,"assetId": token}
                                                 ],
-                                            txFee=WAVES_TRANSACTION_FEE
+                                            txFee=WAVES_TRANSACTION_FEE_IMPORT
                                             )
                 print(tx)
                 return True
@@ -82,7 +99,7 @@ class VestingWithdrawal:
         return self.import_vtoken(amount, VIRES_USDTLP_ADDRESS)
 
     def import_USDCLP(self, amount):
-        return self.import_vtoken(amount, VIRES_USDTLP_ADDRESS)
+        return self.import_vtoken(amount, VIRES_USDCLP_ADDRESS)
 
     def get_block_height(self):
         result = simplejson.loads(requests.get(''.join([WAVES_NODE, WAVES_HEIGHT_API])).text)

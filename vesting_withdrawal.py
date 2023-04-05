@@ -106,3 +106,26 @@ class VestingWithdrawal:
         if not result:
                 return None
         return int(result['height'])
+    
+    def unstake_token(self, token, amount):
+        try:
+            tx = self.address.invokeScript(VIRES_UNSTAKE_CONTRACT,
+                                        VIRES_UNSTAKE_COMMAND,
+                                        [
+                                            {
+                                                "type":"string",
+                                                "value": VIRES_TOKEN_ADDRESSES[token],
+                                            },
+                                            {
+                                                "type": "integer",
+                                                "value": amount
+                                            }
+                                        ],
+                                        [],
+                                        txFee=WAVES_TRANSACTION_FEE_IMPORT
+                                        )
+            print(tx)
+            return True
+        except Exception as e:
+            print(e)
+            return False

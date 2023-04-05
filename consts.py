@@ -22,6 +22,14 @@ LOOP_TIME = 60
 
 WITHDRAW_MAX_TRIES_DAY = 1
 
+VIRES_UNSTAKE_CONTRACT = '3PAZv9tgK1PX7dKR7b4kchq5qdpUS3G5sYT'
+VIRES_UNSTAKE_COMMAND = 'withdraw2'
+VIRES_TOKEN_ADDRESSES = {
+    'eth': '3PPdeWwrzaxqgr6BuReoF3sWfxW8SYv743D',
+    'btc': '3PA7QMFyHMtHeP66SUQnwCgwKQHKpCyXWwd',
+    'xtn': '3PCwFXSq8vj8iKitA5zrrLRbuqehfmimpce',
+}
+
 try:
     from local_consts import *
 except ImportError:

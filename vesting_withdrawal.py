@@ -48,13 +48,13 @@ class VestingWithdrawal:
                 if self.tries == 0:
                     return False
 
-                result = simplejson.loads(requests.get(VIRES_VESTING_API.format(self.address.address)).text)
+                result = simplejson.loads(requests.get(VIRES_LEGACY_DEPOIST_API.format(self.address.address)).text)
                 if not result:
-                    return False
+                    return 2
                 
                 # result is in microusd
-                available_today = int(result['availableToday'])/1000000
-                available_today_global = int(result['globallyAvailableToday'])/1000000
+                available_today = int(result['markets_availableNow'])/1000000
+                available_today_global = int(result['markets_globallyAvailableToday'])/1000000
                 
                 if available_today>0:
                     if available_today_global>0:
@@ -63,12 +63,13 @@ class VestingWithdrawal:
                         print("No money available for withdrawal :(")
                         return False
                 else:
-                    print("Already withdrawed today :)")
+                    print("No more money to withdraw :)")
                     return False
             else:
                 self.tries = WITHDRAW_MAX_TRIES_DAY
-                print('{} blocks left to withdraw'.format(WAVES_DAY_BLOCKS - (height%WAVES_DAY_BLOCKS)))
-                return False
+                blocks_left = WAVES_DAY_BLOCKS - (height%WAVES_DAY_BLOCKS)
+                print('{} blocks left to withdraw'.format(blocks_left))
+                return 1 if blocks_left == 1 else 10 if blocks_left in [2, 3] else False
         except Exception as e: 
             print(e)
             return False

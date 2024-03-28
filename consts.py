@@ -17,6 +17,7 @@ VIRES_VESTING_WITHDRAWAL_ARGS = [
 VIRES_VESTING_API='https://api.vires.finance/user/{}/vesting/markets'
 VIRES_USDTLP_ADDRESS = '2tVLdi5fQXk2JcuDAojhctnDp5B5PZhNMyj5GUpeC3tZ'
 VIRES_USDCLP_ADDRESS = 'FSRHtSyXRXQjzQLRtmaqFpBDDCNjY8PU8KNtwoGXVBmr'
+VIRES_LEGACY_DEPOIST_API = 'https://vires-api.vercel.app/api/evaluate/3PKZk5TdPCLP2GZviipLFfK46ExTnwkRCBd/adviseUser/{}'
 
 LOOP_TIME = 60
 

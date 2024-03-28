@@ -14,14 +14,15 @@ def main():
     vw = VestingWithdrawal(seed=args.seed)
     
     while True:
+        res = False
         if args.withdraw:
-            vw.check_vesting()
+            res = vw.check_vesting()
         if args.token and args.amount:
             if args.token.lower() == 'usdt':
                 vw.import_USDTLP(args.amount)
             elif args.token.lower() == 'usdc':
                 vw.import_USDCLP(args.amount)
-        time.sleep(consts.LOOP_TIME)
+        time.sleep(res if res else consts.LOOP_TIME)
         
 if __name__ == '__main__':
     main()
